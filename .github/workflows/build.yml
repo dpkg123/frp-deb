@@ -1,0 +1,45 @@
+name: Build deb
+
+on:
+  workflow_dispatch:
+    # input version manually as a temporary solution
+    inputs:
+      version:
+        description: 'Version'
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          path: frp-deb
+          sparse-checkout: |
+            !.*
+            /*
+      - name: Download tarball
+        run: |
+          wget https://github.com/fatedier/frp/releases/download/v${{ github.event.inputs.version }}/frp_${{ github.event.inputs.version }}_linux_amd64.tar.gz
+          tar xzvf frp_${{ github.event.inputs.version }}_linux_amd64.tar.gz --strip-components=1
+          mv frp? frp-deb/usr/bin
+      - name: Download configuration
+        run: |
+          wget https://github.com/fatedier/frp/raw/dev/conf/frpc_full_example.toml -O frp-deb/etc/frp/frpc.toml
+          wget https://github.com/fatedier/frp/raw/dev/conf/frps_full_example.toml -O frp-deb/etc/frp/frps.toml
+      - name: Write information
+        run: |
+          sed -e "s/\[VERSION\]/${{ github.event.inputs.version }}/g" -e "s/\[ARCH\]/amd64/g" frp-deb/DEBIAN/control
+      - name: Build package
+        run: |
+          dpkg-deb -b frp-deb frp-${{ github.event.inputs.version }}-amd64.deb
+      - name: Get timestamp
+        id: time
+        uses: nanzm/get-time-action@master
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: v${{ github.event.inputs.version }}-${{ steps.time.outputs.time }}
+          files: |
+            frp-${{ github.event.inputs.version }}-amd64.deb
