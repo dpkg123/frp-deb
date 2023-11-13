@@ -15,7 +15,7 @@ DAEMON=/usr/bin/frpc
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
-DAEMON_OPTS="-c /etc/frp/frpc.ini"
+DAEMON_OPTS="-c /etc/frp/frpc.toml"
 
 # Exit if the package is not installed
 [ -x $DAEMON ] || exit 0
