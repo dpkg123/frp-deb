@@ -1,8 +1,8 @@
 Package: frp
-Version: [VERSION]
+Version: 0.0.1
 Depends: daemon
 Section: utils
 Priority: optional
-Architecture: [ARCH]
+Architecture: amd64
 Maintainer: fatedier <https://github.com/fatedier/frp>
 Description: A fast reverse proxy to help you expose a local server behind a NAT or firewall to the internet.
