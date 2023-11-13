@@ -36,10 +36,11 @@ jobs:
           dpkg-deb -b frp-deb frp-${{ github.event.inputs.version }}-amd64.deb
       - name: Get timestamp
         id: time
-        uses: nanzm/get-time-action@master
+        run: |
+          echo "::set-output name=timestamp::$(date +%s)"
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          name: v${{ github.event.inputs.version }}-${{ steps.time.outputs.time }}
+          tag_name: v${{ github.event.inputs.version }}-${{ steps.time.outputs.timestamp }}
           files: |
             frp-${{ github.event.inputs.version }}-amd64.deb
