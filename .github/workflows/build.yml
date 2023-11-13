@@ -16,9 +16,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: frp-deb
-          sparse-checkout: |
-            !.*
-            /*
+      - name: Exclude hidden folders
+        run: |
+          find frp-deb -type d -name '.*' -exec rm -rf {} +
       - name: Download tarball
         run: |
           wget https://github.com/fatedier/frp/releases/download/v${{ github.event.inputs.version }}/frp_${{ github.event.inputs.version }}_linux_amd64.tar.gz
@@ -30,7 +30,7 @@ jobs:
           wget https://github.com/fatedier/frp/raw/dev/conf/frps_full_example.toml -O frp-deb/etc/frp/frps.toml
       - name: Write information
         run: |
-          sed -e "s/\[VERSION\]/${{ github.event.inputs.version }}/g" -e "s/\[ARCH\]/amd64/g" frp-deb/DEBIAN/control
+          sed -i -e 's/\[VERSION\]/${{ github.event.inputs.version }}/g' -e 's/\[ARCH\]/amd64/g' frp-deb/DEBIAN/control
       - name: Build package
         run: |
           dpkg-deb -b frp-deb frp-${{ github.event.inputs.version }}-amd64.deb
