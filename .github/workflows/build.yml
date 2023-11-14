@@ -2,11 +2,14 @@ name: Build deb
 
 on:
   workflow_dispatch:
-    # input version manually as a temporary solution
     inputs:
       version:
         description: 'Version'
         required: true
+      arch:
+        description: 'Architecture'
+        required: true
+        default: 'amd64'
 
 jobs:
   build:
@@ -21,8 +24,8 @@ jobs:
           find frp-deb -type d -name '.*' -exec rm -rf {} +
       - name: Download tarball
         run: |
-          wget https://github.com/fatedier/frp/releases/download/v${{ github.event.inputs.version }}/frp_${{ github.event.inputs.version }}_linux_amd64.tar.gz
-          tar xzvf frp_${{ github.event.inputs.version }}_linux_amd64.tar.gz --strip-components=1
+          wget https://github.com/fatedier/frp/releases/download/v${{ github.event.inputs.version }}/frp_${{ github.event.inputs.version }}_linux_${{ github.event.inputs.arch }}.tar.gz
+          tar xzvf frp_${{ github.event.inputs.version }}_linux_${{ github.event.inputs.arch }}.tar.gz --strip-components=1
           mv frp? frp-deb/usr/bin
       - name: Download configuration
         run: |
@@ -30,17 +33,19 @@ jobs:
           wget https://github.com/fatedier/frp/raw/dev/conf/frps_full_example.toml -O frp-deb/etc/frp/frps.toml
       - name: Write information
         run: |
-          sed -i -e 's/\[VERSION\]/${{ github.event.inputs.version }}/g' -e 's/\[ARCH\]/amd64/g' frp-deb/DEBIAN/control
+          sed -i -e 's/\[VERSION\]/${{ github.event.inputs.version }}/g' -e 's/\[ARCH\]/${{ github.event.inputs.arch }}/g' frp-deb/DEBIAN/control
       - name: Build package
         run: |
-          dpkg-deb -b frp-deb frp-${{ github.event.inputs.version }}-amd64.deb
+          dpkg-deb -b frp-deb frp-${{ github.event.inputs.version }}-${{ github.event.inputs.arch }}.deb
       - name: Get timestamp
         id: time
         run: |
-          echo "::set-output name=timestamp::$(date +%s)"
+          echo ::set-output name=timestamp::$(date +%s)
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ github.event.inputs.version }}-${{ steps.time.outputs.timestamp }}
+          body: |
+            [View Changelog](https://github.com/fatedier/frp/releases/tag/v${{ github.event.inputs.version }})
           files: |
-            frp-${{ github.event.inputs.version }}-amd64.deb
+            frp-${{ github.event.inputs.version }}-${{ github.event.inputs.arch }}.deb
