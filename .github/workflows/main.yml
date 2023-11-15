@@ -23,7 +23,7 @@ jobs:
     - run: cd frp-deb && sed -i "s/\[ARCH\]/amd64/g" DEBIAN/control && cd ..
     - run: rm -rf -v frp-deb/.git frp-deb/.github
     - run: rm -rf -v frp-deb/LICENSE frp-deb/README.md frp-deb/*.sh
-    - run: wget   wget https://github.com/fatedier/frp/raw/dev/conf/frpc_full_example.toml -O frp-deb/etc/frp/frpc.toml
+    - run: wget https://github.com/fatedier/frp/raw/dev/conf/frpc_full_example.toml -O frp-deb/etc/frp/frpc.toml
     - run: wget https://github.com/fatedier/frp/raw/dev/conf/frps_full_example.toml -O frp-deb/etc/frp/frps.toml
     - run: go mod download 
     - run: make frpc && make frps
