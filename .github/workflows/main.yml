@@ -26,7 +26,7 @@ jobs:
     - run: wget https://github.com/fatedier/frp/raw/dev/conf/frpc_full_example.toml -O frp-deb/etc/frp/frpc.toml
     - run: wget https://github.com/fatedier/frp/raw/dev/conf/frps_full_example.toml -O frp-deb/etc/frp/frps.toml
     - run: go mod download 
-    - run: make frpc && make frps
+    - run: make frpc
     - run: cp bin -rv frp-deb/usr/
     - run: dpkg -b frp-deb
     - name: Upload to Artifact 
